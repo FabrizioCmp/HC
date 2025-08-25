@@ -112,8 +112,6 @@ Method OnRequest(request As Ens.StreamContainer, Output response As Ens.StreamCo
         set sc = ..CDATransform(CDAStream, tParams, .CDATransformedStream)
         
         if $$$ISERR(sc) return sc
-        while 'CDATransformedStream.AtEnd { $$$LOGINFO("transformed: "_ CDATransformedStream.Read(10000))}
-        
 
         do CDATransformedStream.Rewind()
         do CDAStream.Rewind()
