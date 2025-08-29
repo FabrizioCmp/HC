@@ -16,9 +16,12 @@ Property SaveCDA As %Boolean [ InitialExpression = 0 ];
 Property TargetOperation As %String(MAXLEN = 1000) [ InitialExpression = "DEV.Bo.HL7.XML.fileOperation" ];
 
 /// Where the intermediate files are saved
-Property WorkPath As %String [ InitialExpression = "/home/InterSystems/HC/testRepo/" ];
+Property WorkPath As %String(MAXLEN = 1000) [ InitialExpression = "/home/InterSystems/HC/testRepo/IntermediateFiles" ];
 
-Parameter SETTINGS = "SavePDF:Basic,SaveCDA:Basic,TargetOperation:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},WorkPath:Basic:directorySelector";
+/// Put the XSLT file in this directory to transform the CDA
+Property XSLTfilePath As %String(MAXLEN = 1000) [ InitialExpression = "C:\InterSystems\HC\testRepo\XSLT\CDAEmilia\transform.xslt" ];
+
+Parameter SETTINGS = "SavePDF:Basic,SaveCDA:Basic,TargetOperation:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},WorkPath:Basic:directorySelector,XSLTfilePath:Basic:directorySelector";
 
 Method OnRequest(request As Ens.StreamContainer, Output response As Ens.StreamContainer) As %Status
 {
@@ -190,7 +193,7 @@ ClassMethod StreamToBytes(stream As %Stream.Object) As %SYS.Python
 }
 
 /// Python method that extracts the CDA form a PDF Stream 
-ClassMethod CDAExtraction(stream As %Stream.Object) As %Stream.Object [ Language = python ]
+Method CDAExtraction(stream As %Stream.Object) As %Stream.Object [ Language = python ]
 {
     import iris
     import pikepdf
@@ -206,7 +209,7 @@ ClassMethod CDAExtraction(stream As %Stream.Object) As %Stream.Object [ Language
         pdf_bytes.extend(iris._SYS.Python.Bytes(stream.Read(maxlen)))
     
     # setting the folder where the CDA extracted will be saved
-    cartella_output = '/home/InterSystems/allegati'
+    cartella_output = self.WorkPath
 
     # CDA extraction from pdf
     with pikepdf.open(BytesIO(pdf_bytes)) as pdf:
@@ -233,7 +236,7 @@ ClassMethod CDAExtraction(stream As %Stream.Object) As %Stream.Object [ Language
 }
 
 /// PDFwithCDA stream as Input. Remove CDA and return PDF stream without CDA
-ClassMethod CDADetach(stream As %Stream.Object) As %Stream.Object [ Language = python ]
+Method CDADetach(stream As %Stream.Object) As %Stream.Object [ Language = python ]
 {
     import iris
     import pikepdf
@@ -267,7 +270,7 @@ ClassMethod CDADetach(stream As %Stream.Object) As %Stream.Object [ Language = p
             del pdf.attachments[nome_file]
 
             # save to disk the modified PDF without attachment to disk (uncomment if needed)
-            # pdf.save('/home/InterSystems/allegati/pdfNo.pdf')
+            # pdf.save(self.WorkPath)
 
             # save the PDF without attachments to a memory buffer
             buffer = BytesIO()
@@ -282,11 +285,11 @@ ClassMethod CDADetach(stream As %Stream.Object) As %Stream.Object [ Language = p
 }
 
 /// CDA Transformation
-ClassMethod CDATransform(CDAin As %Stream.Object, tParams As %ArrayOfDataTypes, Output CDAout As %Stream.Object) As %Status
+Method CDATransform(CDAin As %Stream.Object, tParams As %ArrayOfDataTypes, Output CDAout As %Stream.Object) As %Status
 {
     Set sc = $$$OK
     Try {
-        set sc = ##class(%XML.XSLT.CompiledStyleSheet).CreateFromFile("/home/InterSystems/HC/testRepo/XSLT/transform.xslt", .xslt) 
+        set sc = ##class(%XML.XSLT.CompiledStyleSheet).CreateFromFile(..XSLTfilePath, .xslt) 
         If $$$ISERR(sc) Quit 
 
         set sc = ##class(%XML.XSLT.Transformer).TransformStreamWithCompiledXSL(CDAin, xslt, .CDATransformed,,tParams)
@@ -303,7 +306,7 @@ ClassMethod CDATransform(CDAin As %Stream.Object, tParams As %ArrayOfDataTypes, 
 /// This method attaches an XML document (CDA file) to an existing PDF retrieved as an IRIS stream.
 /// Takes as input the XML stream, the destination PDF stream, and the attachment name.
 /// It outputs a binary stream containing the updated PDF with the embedded XML.
-ClassMethod CDAAttach(xmlStream As %Stream.Object, pdfStream As %Stream.Object, CDAname As %String) As %Stream.Object [ Language = python ]
+Method CDAAttach(xmlStream As %Stream.Object, pdfStream As %Stream.Object, CDAname As %String) As %Stream.Object [ Language = python ]
 {
     import iris, io
     from pikepdf import Pdf, AttachedFileSpec
@@ -341,7 +344,7 @@ ClassMethod CDAAttach(xmlStream As %Stream.Object, pdfStream As %Stream.Object, 
     pdf.attachments[CDAname] = filespec
 
     # save the resulting PDF with attachment to disk
-    pdf.save("/home/InterSystems/allegati/output_con_cda.pdf")
+    pdf.save(self.WorkPath + "file_con_CDA.pdf")
 
     # prepare the output PDF as a binary stream for return to IRIS
     buf = io.BytesIO()
@@ -488,6 +491,9 @@ Storage Default
 </Value>
 <Value name="4">
 <Value>TargetOperation</Value>
+</Value>
+<Value name="5">
+<Value>XSLTfilePath</Value>
 </Value>
 </Data>
 <DefaultData>HL7ProcessDefaultData</DefaultData>
