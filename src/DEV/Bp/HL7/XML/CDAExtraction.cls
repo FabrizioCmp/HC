@@ -12,13 +12,13 @@ Property SavePDF As %Boolean [ InitialExpression = 0 ];
 /// BusinessHost setting: saving pdf file to the file system
 Property SaveCDA As %Boolean [ InitialExpression = 0 ];
 
-/// Description
-Property TargetOperation As %String(MAXLEN = 1000);
+/// send HL7 message transformed to this operation
+Property TargetOperation As %String(MAXLEN = 1000) [ InitialExpression = "DEV.Bo.HL7.XML.fileOperation" ];
 
-/// Description
+/// Where the intermediate files are saved
 Property WorkPath As %String [ InitialExpression = "/home/InterSystems/HC/testRepo/" ];
 
-Parameter SETTINGS = "SavePDF:Basic,SaveCDA:Basic,TargetOperation:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
+Parameter SETTINGS = "SavePDF:Basic,SaveCDA:Basic,TargetOperation:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},WorkPath:Basic:directorySelector";
 
 Method OnRequest(request As Ens.StreamContainer, Output response As Ens.StreamContainer) As %Status
 {
