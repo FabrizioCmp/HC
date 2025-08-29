@@ -6,10 +6,10 @@ Standard Produciotn Flow: DEV.Bs.HL7.XML.FileService -> DEV.Bp.HL7.XML.CDAExtrac
 Class DEV.Bp.HL7.XML.CDAExtraction Extends Ens.BusinessProcess
 {
 
-/// BusinessHost setting: saving pdf file to the fiel system
+/// BusinessHost setting: saving pdf file to the file system
 Property SavePDF As %Boolean [ InitialExpression = 0 ];
 
-/// BusinessHost setting: saving pdf file to the fiel system
+/// BusinessHost setting: saving pdf file to the file system
 Property SaveCDA As %Boolean [ InitialExpression = 0 ];
 
 /// Description
