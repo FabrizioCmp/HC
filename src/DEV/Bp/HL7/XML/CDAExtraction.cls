@@ -21,7 +21,7 @@ Property WorkPath As %String(MAXLEN = 1000) [ InitialExpression = "/home/InterSy
 /// Put the XSLT file in this directory to transform the CDA
 Property XSLTfilePath As %String(MAXLEN = 1000) [ InitialExpression = "C:\InterSystems\HC\testRepo\XSLT\CDAEmilia\transform.xslt" ];
 
-Parameter SETTINGS = "SavePDF:Basic,SaveCDA:Basic,TargetOperation:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},WorkPath:Basic:directorySelector,XSLTfilePath:Basic:directorySelector";
+Parameter SETTINGS = "SavePDF:Basic,SaveCDA:Basic,TargetOperation:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},WorkPath:Basic:directorySelector,XSLTfilePath:Basic:fileSelector";
 
 Method OnRequest(request As Ens.StreamContainer, Output response As Ens.StreamContainer) As %Status
 {
