@@ -36,6 +36,8 @@ Method OnProcessInput(pInput As %Stream.Object, pOutput As %RegisteredObject) As
 
         set hl7MessageEr7 = ##class(ITB.HL7.Util.Convert).XMLToER7(hl7GlobalStream, .sc, "2.3.1")
 
+        $$$LOGINFO(hl7MessageEr7.RawContentGet())
+
         set messageStream = ##class(Ens.StreamContainer).%New()
         set messageStream.Stream = hl7GlobalStream
         

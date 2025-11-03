@@ -41,6 +41,8 @@ Method OnProcessInput(pInput As %Stream.Object, pOutput As %RegisteredObject) As
         set msgType = hl7MessageEr7.GetValueAt("MSH:9.3")
         set hl7MessageEr7.DocType= ..SchemaHl7_":"_msgType
 
+        $$$LOGINFO(hl7MessageEr7.RawContent)
+
         set sc=##class(EnsLib.HL7.Util.Validator).Validate(hl7MessageEr7,"dmr-z")
         if $$$ISERR(sc) quit
 

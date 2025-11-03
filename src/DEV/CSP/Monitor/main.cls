@@ -5,19 +5,27 @@ Class DEV.CSP.Monitor.main Extends %CSP.Page
 
 ClassMethod OnPage() As %Status
 {
-   Set html="<!DOCTYPE html>"
-           _"<html lang=""en"" dir=""ltr"">"
-           _"<body>"
-           _"<h1>Monitor</h1>"
-           
-   // examine %request object and
-   // write more output...
 
-   Set html=html_"</body>"
-                _"</html>"
+
+
+   &html<
+    <!DOCTYPE html>
+    <html lang="en" dir="ltr">
+    <body>
+    <h1>Monitor</h1>
+    <div><b>Scadenza certificati TLS</b></div>
+    <div></div>
+    </body>
+    </html>
+   >
  
-   Write html //finally, write the page
    Quit $$$OK
+}
+
+/// Description
+ClassMethod writeHello() As %String
+{
+    quit $NAMESPACE
 }
 
 }
